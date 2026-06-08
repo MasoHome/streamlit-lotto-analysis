@@ -7,6 +7,7 @@ import os
 import time
 from analyzer import get_filtered_pools, calculate_ratio_frequency
 
+# python app starting point
 # Custom CSS to create a gray overlay
 st.markdown("""
     <style>
@@ -65,6 +66,7 @@ def extract_number(s):
 
 
 # --- Data Fetching ---
+@st.cache_data(ttl=3600) # Cache for 1 hour
 @st.cache_data
 def get_data(game_config):
     source = game_config["source"]
@@ -79,7 +81,7 @@ def get_data(game_config):
             else:
                 return None
         else:
-            full_path = os.path.join(base_dir, source)
+            full_path = os.path.join(base_dir, "data", source)
             if os.path.exists(full_path):
                 df = pd.read_csv(full_path)
             else:
