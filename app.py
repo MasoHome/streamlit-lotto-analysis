@@ -171,13 +171,20 @@ if df is not None:
     gen_status_placeholder = st.empty()
 
 
-    # 2. THE BUTTON BLOCK (Logic only)
-    if st.button("Generate Matrix"):
-        # Trigger the processing message
-        gen_status_placeholder.markdown('<div class="loading-overlay">Generating Matrix... Please wait</div>', unsafe_allow_html=True)
-        
-        # We use a slight delay so the UI registers the loading state
-        time.sleep(1) 
+    # 2. THE BUTTON BLOCK (Logic & Quick Pick)
+    col_btn1, col_btn2 = st.columns(2)
+    
+    with col_btn1:
+        if st.button("✨ Quick Pick Strategy"):
+            st.session_state.o_type = "Hot"
+            st.session_state.e_type = "Hot"
+            st.rerun() # Refresh to update the UI
+            
+    with col_btn2:
+        if st.button("Generate Matrix"):
+            # Trigger the processing message
+            gen_status_placeholder.markdown('<div class="loading-overlay">Generating Matrix... Please wait</div>', unsafe_allow_html=True)
+            time.sleep(1)
         
         try:
             if (req_odds + req_evens) != game["pick_size"]:
