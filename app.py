@@ -119,16 +119,7 @@ if df is not None:
     with col_p1:
         req_odds = st.number_input("Odds to pick", 0, game["pick_size"], value=game["pick_size"] // 2)
     with col_p2:
-        req_evens = st.number_input("Evens to pick", 0, game["pick_size"], value=game["pick_size"] - (game["pick_size"] // 2))
-
-
-    # --- ADD THIS QUICK PICK BUTTON ---
-    if st.button("✨ Quick Pick Strategy"):
-        # We define a "winning" default strategy
-        st.session_state.o_type = "Hot"
-        st.session_state.e_type = "Hot"
-        # Force a rerun to update the UI sliders
-        st.rerun()
+        req_evens = st.number_input("Evens to pick", 0, game["pick_size"], value=game["pick_size"] - (game["pick_size"] // 2))   
 
 
     # --- Frequency Calculation ---
