@@ -21,7 +21,6 @@ def get_winning_columns(df):
     
     return sorted(final_cols)
     
-
 def get_filtered_pools(df, game_config, o_size, e_size, o_type, e_type):
     ball_cols = get_winning_columns(df)
     
