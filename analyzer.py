@@ -2,12 +2,10 @@ import pandas as pd
 import numpy as np
 
 def get_winning_columns(df):
-  
-   # 1. Normalize headers to lowercase
+    # 1. Normalize headers to lowercase
     df.columns = df.columns.str.lower()
     
     # 2. Define the terms that identify ANY ball we want to count
-    # This will catch 'winning number 1', 'supplementary number', etc.
     search_terms = ['winning']
     
     # 3. Build the list of columns
@@ -16,14 +14,17 @@ def get_winning_columns(df):
         if any(term in col for term in search_terms)
     ]
     
-    # This will print every time the function is called
     print(f"DEBUG: Found {len(final_cols)} winning columns: {final_cols}")
     
     return sorted(final_cols)
     
 
     
-def get_filtered_pools(df, game_config, o_size, e_size, o_type, e_type):
+def get_filtered_pools(df, game_config, o_size, e_size, o_type, e_type, last_n_draws=None):
+    # --- NEW: slice to draw window if provided ---
+    if last_n_draws is not None:
+        df = df.head(last_n_draws)
+
     ball_cols = get_winning_columns(df)
     
     # Extract only valid numeric balls
