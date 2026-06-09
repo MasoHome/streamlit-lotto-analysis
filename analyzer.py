@@ -21,6 +21,8 @@ def get_winning_columns(df):
     
     return sorted(final_cols)
     
+
+    
 def get_filtered_pools(df, game_config, o_size, e_size, o_type, e_type):
     ball_cols = get_winning_columns(df)
     
@@ -39,6 +41,8 @@ def get_filtered_pools(df, game_config, o_size, e_size, o_type, e_type):
     evens_pool = sorted(evens, key=lambda x: freq.get(x, 0), reverse=(e_type == "Hot"))[:e_size]
         
     return sorted(odds_pool), sorted(evens_pool)
+
+
 
 def calculate_ratio_frequency(df, game_config, req_odds):
     ball_cols = get_winning_columns(df)

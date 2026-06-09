@@ -116,6 +116,15 @@ if df is not None:
         req_evens = st.number_input("Evens to pick", 0, game["pick_size"], value=game["pick_size"] - (game["pick_size"] // 2))
 
 
+    # --- ADD THIS QUICK PICK BUTTON ---
+    if st.button("✨ Quick Pick Strategy"):
+        # We define a "winning" default strategy
+        st.session_state.o_type = "Hot"
+        st.session_state.e_type = "Hot"
+        # Force a rerun to update the UI sliders
+        st.rerun()
+
+
     # --- Frequency Calculation ---
     freq_percent = calculate_ratio_frequency(df, game, req_odds)
     st.write(f"The **{req_odds}:{req_evens}** ratio historically covers **{freq_percent:.2f}%** of winning draws.")
@@ -215,7 +224,14 @@ if df is not None:
             }
         )
    
-
+        # transform the data to a csv for the user be able to download
+        csv = df_display.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Results as CSV",
+            data=csv,
+            file_name='lotto_matrix.csv',
+            mime='text/csv',
+        )
 
 
     # History Analysis Section
