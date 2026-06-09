@@ -98,7 +98,13 @@ df = get_data(game)
 if df is not None:
     # section
     st.subheader("🛡️ Strategy Filters")
-    col1, col2 = st.columns(2)  
+    col1, col2 = st.columns(2)
+    # with col1:
+    #     o_type = st.radio("Odd Type", ["Hot", "Cold"], horizontal=True)
+    #     o_size = st.slider("Size of Odd Pool", 5, 20, 10)
+    # with col2:
+    #     e_type = st.radio("Even Type", ["Hot", "Cold"], horizontal=True)
+    #     e_size = st.slider("Size of Even Pool", 5, 20, 10)
     with col1:
         o_type = st.radio("Odd Type", ["Hot", "Cold"], horizontal=True, key="o_type")
         o_size = st.slider("Size of Odd Pool", 5, 20, 10)
@@ -165,49 +171,39 @@ if df is not None:
     gen_status_placeholder = st.empty()
 
 
-    # 2. THE BUTTON BLOCK
-    col_btn1, col_btn2 = st.columns(2)
-    
-    with col_btn1:
-        if st.button("✨ Quick Pick Strategy"):
-            st.session_state.o_type = "Hot"
-            st.session_state.e_type = "Hot"
-            st.rerun()
-            
-    with col_btn2:
     # 2. THE BUTTON BLOCK (Logic only)
-        if st.button("Generate Matrix"):
-            # Trigger the processing message
-            gen_status_placeholder.markdown('<div class="loading-overlay">Generating Matrix... Please wait</div>', unsafe_allow_html=True)
-            
-            # We use a slight delay so the UI registers the loading state
-            time.sleep(1) 
-            
-            try:
-                if (req_odds + req_evens) != game["pick_size"]:
-                    st.error(f"⚠️ Invalid Pattern: Must total {game['pick_size']} numbers.")
+    if st.button("Generate Matrix"):
+        # Trigger the processing message
+        gen_status_placeholder.markdown('<div class="loading-overlay">Generating Matrix... Please wait</div>', unsafe_allow_html=True)
+        
+        # We use a slight delay so the UI registers the loading state
+        time.sleep(1) 
+        
+        try:
+            if (req_odds + req_evens) != game["pick_size"]:
+                st.error(f"⚠️ Invalid Pattern: Must total {game['pick_size']} numbers.")
+                st.session_state.df_matrix = None
+            else:
+                matrix_data = []
+                for o in itertools.combinations(odds_pool, req_odds):
+                    for e in itertools.combinations(evens_pool, req_evens):
+                        combo = sorted(list(o) + list(e))
+                        combo_sum = sum(combo)
+                        if not enable_filter or (min_pool_sum <= combo_sum <= max_pool_sum):
+                            matrix_data.append([combo_sum] + combo)
+                
+                if not matrix_data:
+                    st.warning("⚠️ No combinations found in this range.")
                     st.session_state.df_matrix = None
                 else:
-                    matrix_data = []
-                    for o in itertools.combinations(odds_pool, req_odds):
-                        for e in itertools.combinations(evens_pool, req_evens):
-                            combo = sorted(list(o) + list(e))
-                            combo_sum = sum(combo)
-                            if not enable_filter or (min_pool_sum <= combo_sum <= max_pool_sum):
-                                matrix_data.append([combo_sum] + combo)
-                    
-                    if not matrix_data:
-                        st.warning("⚠️ No combinations found in this range.")
-                        st.session_state.df_matrix = None
-                    else:
-                        st.session_state.df_matrix = pd.DataFrame(matrix_data, columns=["Sum"] + [f"N{i}" for i in range(1, game['pick_size']+1)])
-                        st.session_state.matrix_msg = f"Successfully generated {len(st.session_state.df_matrix)} combinations."
-            except Exception as e:
-                st.error(f"Error: {e}")
-                st.session_state.df_matrix = None
-            finally:
-                # Clear the processing message immediately when done
-                gen_status_placeholder.empty()
+                    st.session_state.df_matrix = pd.DataFrame(matrix_data, columns=["Sum"] + [f"N{i}" for i in range(1, game['pick_size']+1)])
+                    st.session_state.matrix_msg = f"Successfully generated {len(st.session_state.df_matrix)} combinations."
+        except Exception as e:
+            st.error(f"Error: {e}")
+            st.session_state.df_matrix = None
+        finally:
+            # Clear the processing message immediately when done
+            gen_status_placeholder.empty()
 
 
 
