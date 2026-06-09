@@ -174,8 +174,9 @@ if df is not None:
     # 2. THE BUTTON BLOCK (Logic & Quick Pick)
     col_btn1, col_btn2 = st.columns(2)
     
+    
     with col_btn1:
-        if st.button("✨ Quick Pick Strategy"):
+        if st.button("✨ Quick Pick Strategy", key="quick_pick_btn"):
             st.session_state.o_type = "Hot"
             st.session_state.e_type = "Hot"
             st.rerun() # Refresh to update the UI
