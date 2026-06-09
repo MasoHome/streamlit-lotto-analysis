@@ -54,7 +54,8 @@ st.title("🎯 Universal Lotto Ratio Matrix Engine")
 
 st.markdown("### 🎲 Select Lottery Game:")
 with st.container():
-    selected_game = st.selectbox("", list(GAMES.keys()))    
+    # selected_game = st.selectbox("", list(GAMES.keys()))    
+    selected_game = st.selectbox("Select a game:", list(GAMES.keys()), label_visibility="collapsed")
     # This adds vertical space before the Strategy Filters section starts
     st.write("<div style='margin-bottom: 40px;'></div>", unsafe_allow_html=True)
     game = GAMES[selected_game]
@@ -114,28 +115,19 @@ if df is not None:
     with col_p2:
         req_evens = st.number_input("Evens to pick", 0, game["pick_size"], value=game["pick_size"] - (game["pick_size"] // 2))
 
+
     # --- Frequency Calculation ---
     freq_percent = calculate_ratio_frequency(df, game, req_odds)
     st.write(f"The **{req_odds}:{req_evens}** ratio historically covers **{freq_percent:.2f}%** of winning draws.")
 
     odds_pool, evens_pool = get_filtered_pools(df, game, o_size, e_size, o_type, e_type)
 
-# # --- INSERT THE DEBUG TABLE HERE ---
-#     # Add this logic to visualize the frequency clearly:
-#     from analyzer import get_winning_columns # Ensure this is imported or available
-#     ball_cols = get_winning_columns(df)
-#     all_balls = df[ball_cols].apply(pd.to_numeric, errors='coerce').stack().dropna().astype(int)
-    
-#     st.write("### Top 20 Most Frequent Numbers")
-#     top_20 = all_balls.value_counts().head(20).reset_index()
-#     top_20.columns = ['Number', 'Frequency']
-#     st.table(top_20)
-#     # --- END INSERT ---
-
-
     st.markdown(f"**Current Pool Odds No Supps Taken ({o_type}):** `{sorted(odds_pool)}`")
     st.markdown(f"**Current Pool Evens No Supps Taken ({e_type}):** `{sorted(evens_pool)}`")
     
+
+
+
     # --- Dynamic Range Calculation ---
     all_selected_nums = sorted(odds_pool + evens_pool)
     min_pool_sum = sum(all_selected_nums[:game["pick_size"]])
@@ -144,8 +136,16 @@ if df is not None:
     
     # CORRECT
     with st.container():
-        st.markdown(f"**Auto-Calculated Pool Range:** `{min_pool_sum}` to `{max_pool_sum}`")   
-        sum_range = st.slider("", 21, global_max, (min_pool_sum, max_pool_sum) )                
+        # st.markdown(f"**Auto-Calculated Pool Range:** `{min_pool_sum}` to `{max_pool_sum}`")   
+        sum_range = st.slider("Select range:", 21, global_max, (min_pool_sum, max_pool_sum), label_visibility="collapsed")
+        # sum_range = st.slider("", 21, global_max, (min_pool_sum, max_pool_sum) )        
+        sum_range = st.slider(
+            "Select sum range:", 
+            21, 
+            global_max, 
+            (min_pool_sum, max_pool_sum), 
+            label_visibility="collapsed"
+        )        
         st.markdown("<p style='text-align: center; margin-top: -15px; margin-bottom: 25px;'>Move slider to refine your search.</p>", unsafe_allow_html=True)
 
     enable_filter = st.checkbox("Apply Bell Curve Filter", value=True)
@@ -154,6 +154,7 @@ if df is not None:
 
     # 1. Generate Matrix
     gen_status_placeholder = st.empty()
+
 
     # 2. THE BUTTON BLOCK (Logic only)
     if st.button("Generate Matrix"):
@@ -189,6 +190,8 @@ if df is not None:
             # Clear the processing message immediately when done
             gen_status_placeholder.empty()
 
+
+
     # 3. THE DISPLAY BLOCK (Renders once per rerun)  
     if 'df_matrix' in st.session_state and st.session_state.df_matrix is not None:
         # 1. Prepare data
@@ -212,6 +215,8 @@ if df is not None:
             }
         )
    
+
+
 
     # History Analysis Section
     st.markdown("## 🔍 Historical Coverage Analysis")
