@@ -27,6 +27,10 @@ st.write("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
 # ------------------------------------------------------------------ #
 use_hot_cold = st.checkbox("🔥 Use Hot/Cold pool instead of full pool", value=False)
 
+if st.session_state.get("qp_prev_hot_cold") != use_hot_cold:
+    st.session_state.df_quick_pick = None
+st.session_state.qp_prev_hot_cold = use_hot_cold
+
 if use_hot_cold:
     df = get_data(game)
 
