@@ -105,7 +105,21 @@ claude
 
 ---
 
-## 7. Clone Your Repository (if needed)
+## 7. Install the Claude Code VS Code Extension
+
+The VS Code extension provides the chat panel, sidebar, and keyboard shortcuts inside the editor. It requires the CLI (step 5) to be installed and authenticated first.
+
+1. Open VS Code
+2. Open Extensions: **Ctrl + Shift + X**
+3. Search for **Claude Code**
+4. Click **Install**
+5. Once installed, the extension automatically connects to the authenticated CLI
+
+You should see the Claude icon appear in the VS Code sidebar.
+
+---
+
+## 8. Clone Your Repository (if needed)
 
 If you need to clone an existing project from GitHub:
 
@@ -130,7 +144,7 @@ code your-repo
 
 ---
 
-## 8. Start Claude Code in Your Project
+## 9. Start Claude Code in Your Project
 
 1. Open your project folder in VS Code
 2. Open the terminal: **Ctrl + `**
