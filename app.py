@@ -22,9 +22,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-welcome = st.Page("home.py", title="Welcome", default=True)
-singles = st.Page("pages/hot_cold_singles.py", title="Hot Cold Singles")
-quick   = st.Page("pages/quick_pick.py", title="Quick Pick")
+welcome   = st.Page("home.py", title="Welcome", default=True)
+singles   = st.Page("pages/hot_cold_singles.py", title="Hot Cold Singles")
+quick     = st.Page("pages/quick_pick.py", title="Quick Pick")
+my_system = st.Page("pages/my_system.py", title="My System")
 
-pg = st.navigation([welcome, singles, quick])
+pg = st.navigation([welcome, singles, quick, my_system])
 pg.run()

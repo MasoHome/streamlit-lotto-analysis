@@ -48,18 +48,22 @@ def render_strategy_workflow(df, game, odds_pool, evens_pool, page_key,
     #  Custom Pattern Ratio
     # ------------------------------------------------------------------ #
     st.markdown("## 🔢 Custom Pattern Ratio")
+    enable_ratio = st.checkbox("Apply Custom Pattern Ratio", value=True, key=k("enable_ratio"))
+
     if game.get("bonus_ball"):
         col_p1, col_p2, col_p3 = st.columns(3)
     else:
         col_p1, col_p2 = st.columns(2)
     with col_p1:
         req_odds = st.number_input(
-            "Odds to pick", 0, game["pick_size"], value=game["pick_size"] // 2, key=k("req_odds")
+            "Odds to pick", 0, game["pick_size"], value=game["pick_size"] // 2,
+            key=k("req_odds"), disabled=not enable_ratio
         )
     with col_p2:
         req_evens = st.number_input(
             "Evens to pick", 0, game["pick_size"],
-            value=game["pick_size"] - (game["pick_size"] // 2), key=k("req_evens")
+            value=game["pick_size"] - (game["pick_size"] // 2),
+            key=k("req_evens"), disabled=not enable_ratio
         )
     if game.get("bonus_ball"):
         with col_p3:
@@ -71,8 +75,11 @@ def render_strategy_workflow(df, game, odds_pool, evens_pool, page_key,
     else:
         powerball_num = None
 
-    freq_percent = calculate_ratio_frequency(df, game, req_odds)
-    st.write(f"The **{req_odds}:{req_evens}** ratio historically covers **{freq_percent:.2f}%** of winning draws.")
+    if enable_ratio:
+        freq_percent = calculate_ratio_frequency(df, game, req_odds)
+        st.write(f"The **{req_odds}:{req_evens}** ratio historically covers **{freq_percent:.2f}%** of winning draws.")
+    else:
+        st.caption("Ratio filter disabled — all odd/even splits will be included.")
 
     st.write("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
 
@@ -184,16 +191,22 @@ def render_strategy_workflow(df, game, odds_pool, evens_pool, page_key,
     st.caption("📌 Once generated, your system will be available to download as a **CSV**, **XLSX** or **JSON** file.")
 
     def run_generation():
-        if (req_odds + req_evens) != game["pick_size"]:
-            st.error(f"⚠️ Invalid Pattern: Must total {game['pick_size']} numbers.")
-            st.session_state[k("df_matrix")] = None
-            return
+        if enable_ratio:
+            if (req_odds + req_evens) != game["pick_size"]:
+                st.error(f"⚠️ Invalid Pattern: Must total {game['pick_size']} numbers.")
+                st.session_state[k("df_matrix")] = None
+                return
+            if req_odds > len(odds_pool) or req_evens > len(evens_pool):
+                st.error(
+                    f"⚠️ Pool too small: need {req_odds} odd / {req_evens} even numbers, "
+                    f"but pool has {len(odds_pool)} odd / {len(evens_pool)} even."
+                )
+                st.session_state[k("df_matrix")] = None
+                return
 
-        if req_odds > len(odds_pool) or req_evens > len(evens_pool):
-            st.error(
-                f"⚠️ Pool too small: need {req_odds} odd / {req_evens} even numbers, "
-                f"but pool has {len(odds_pool)} odd / {len(evens_pool)} even."
-            )
+        full_pool = sorted(odds_pool + evens_pool)
+        if not enable_ratio and len(full_pool) < game["pick_size"]:
+            st.error(f"⚠️ Pool too small: need at least {game['pick_size']} numbers.")
             st.session_state[k("df_matrix")] = None
             return
 
@@ -201,9 +214,23 @@ def render_strategy_workflow(df, game, odds_pool, evens_pool, page_key,
         excluded_consec = 0
         excluded_last_digit = 0
         excluded_sum = 0
-        for o in itertools.combinations(odds_pool, req_odds):
-            for e in itertools.combinations(evens_pool, req_evens):
-                combo = sorted(list(o) + list(e))
+
+        combos_iter = (
+            (itertools.combinations(odds_pool, req_odds), itertools.combinations(evens_pool, req_evens))
+            if enable_ratio
+            else None
+        )
+
+        def all_combos():
+            if enable_ratio:
+                for o in itertools.combinations(odds_pool, req_odds):
+                    for e in itertools.combinations(evens_pool, req_evens):
+                        yield sorted(list(o) + list(e))
+            else:
+                for c in itertools.combinations(full_pool, game["pick_size"]):
+                    yield list(c)
+
+        for combo in all_combos():
                 combo_sum = sum(combo)
                 if enable_filter and not (sum_range[0] <= combo_sum <= sum_range[1]):
                     excluded_sum += 1
@@ -246,13 +273,16 @@ def render_strategy_workflow(df, game, odds_pool, evens_pool, page_key,
                 msg += " (" + "; ".join(extras) + ")"
             st.session_state[k("matrix_msg")] = msg
 
-            st.session_state[k("pool_space_total")] = (
-                math.comb(len(odds_pool), req_odds) * math.comb(len(evens_pool), req_evens)
-            )
+            if enable_ratio:
+                st.session_state[k("pool_space_total")] = (
+                    math.comb(len(odds_pool), req_odds) * math.comb(len(evens_pool), req_evens)
+                )
+            else:
+                st.session_state[k("pool_space_total")] = math.comb(len(odds_pool) + len(evens_pool), game["pick_size"])
 
     current_filter_state = (
         game["source"], game["pick_size"],
-        sum_range, enable_filter, exclude_two_consec, exclude_three_consec,
+        enable_ratio, sum_range, enable_filter, exclude_two_consec, exclude_three_consec,
         enable_last_digit_filter, max_same_last_digit,
         req_odds, req_evens, tuple(odds_pool), tuple(evens_pool),
         powerball_num,
