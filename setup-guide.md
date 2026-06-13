@@ -144,25 +144,52 @@ code your-repo
 
 ---
 
-## 9. Install Python Dependencies
+## 9. Set Up Python Virtual Environment & Install Dependencies
 
-If the project uses Python (e.g. a Streamlit app), install the required packages after cloning:
+A virtual environment keeps your project dependencies isolated from other Python projects.
 
 1. Make sure **Python** is installed — [https://python.org](https://python.org) (tick **Add to PATH** during install)
 2. Navigate to the project folder in the terminal
-3. Run:
+3. **Create the virtual environment:**
+
+```bash
+python -m venv .venv
+```
+
+4. **Activate the virtual environment:**
+
+- On **Windows (Git Bash):**
+```bash
+source .venv/Scripts/activate
+```
+
+- On **Windows (PowerShell):**
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+- On **Mac / Linux:**
+```bash
+source .venv/bin/activate
+```
+
+You will see `(.venv)` appear at the start of your terminal prompt — this confirms the environment is active.
+
+5. **Install all project dependencies:**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-This installs all dependencies at the exact versions specified in `requirements.txt`.
+This installs streamlit, pandas, numpy, plotly, requests, and openpyxl at the exact pinned versions.
 
-To start the Streamlit app:
+6. **To start the Streamlit app:**
 
 ```bash
 streamlit run app.py
 ```
+
+> **Note:** Always activate the virtual environment (`source .venv/Scripts/activate`) before running the app or installing packages. You need to do this each time you open a new terminal.
 
 ---
 
