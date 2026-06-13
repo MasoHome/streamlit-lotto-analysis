@@ -144,7 +144,29 @@ code your-repo
 
 ---
 
-## 9. Start Claude Code in Your Project
+## 9. Install Python Dependencies
+
+If the project uses Python (e.g. a Streamlit app), install the required packages after cloning:
+
+1. Make sure **Python** is installed — [https://python.org](https://python.org) (tick **Add to PATH** during install)
+2. Navigate to the project folder in the terminal
+3. Run:
+
+```bash
+pip install -r requirements.txt
+```
+
+This installs all dependencies at the exact versions specified in `requirements.txt`.
+
+To start the Streamlit app:
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## 10. Start Claude Code in Your Project
 
 1. Open your project folder in VS Code
 2. Open the terminal: **Ctrl + `**
